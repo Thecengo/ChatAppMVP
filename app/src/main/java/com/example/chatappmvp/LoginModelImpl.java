@@ -1,19 +1,22 @@
 package com.example.chatappmvp;
 
+import android.arch.lifecycle.Lifecycle;
 import android.os.AsyncTask;
 
-public class LoginModelImpl implements LoginModel {
+import com.example.chatappmvp.eventbus.CanceledEvent;
+import com.example.chatappmvp.eventbus.PasswordErrorEvent;
+import com.example.chatappmvp.eventbus.SuccessEvent;
 
-    private OnLoginFinishedListener mListener;
+import org.greenrobot.eventbus.EventBus;
+
+public class LoginModelImpl implements LoginModel {
 
     private static final String [] DUMY_CREDENTIALS = new String[]{
             "cengiz@cengiz.com:asdf1","android@android.com:1adsa"
     };
 
     @Override
-    public void login(String username, String password, OnLoginFinishedListener listener) {
-
-        this.mListener = listener;
+    public void login(String username, String password) {
 
         new UserLoginTask(username,password).execute((Void) null);
 
@@ -55,16 +58,16 @@ public class LoginModelImpl implements LoginModel {
         protected void onPostExecute(final Boolean success){
 
             if(success){
-                mListener.onSuccess();
+                EventBus.getDefault().post(new SuccessEvent());
             }
             else {
-                mListener.onPasswordError();
+                EventBus.getDefault().post(new PasswordErrorEvent(R.string.error_incorrect_password));
             }
 
         }
 
         protected void onCancelled(){
-            mListener.onCanceled();
+            EventBus.getDefault().post(new CanceledEvent());
         }
     }
 

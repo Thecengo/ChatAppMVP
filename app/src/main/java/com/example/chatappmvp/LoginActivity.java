@@ -2,12 +2,21 @@ package com.example.chatappmvp;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.chatappmvp.eventbus.CanceledEvent;
+import com.example.chatappmvp.eventbus.PasswordErrorEvent;
+import com.example.chatappmvp.eventbus.SuccessEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class LoginActivity extends AppCompatActivity implements LoginView {
 
@@ -84,9 +93,32 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     }
 
-    @Override
-    public void successAction() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCanceledEvent(CanceledEvent canceledEvent){
+        showProgress(false);
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPasswordErrorEvent(PasswordErrorEvent passwordErrorEvent){
+        showProgress(false);
+        setPasswordError(passwordErrorEvent.getMessageResId());
+
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSuccessEvent(SuccessEvent successEvent) {
+        showProgress(false);
         Toast.makeText(LoginActivity.this,"Basarili",Toast.LENGTH_LONG).show();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 }
