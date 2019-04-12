@@ -2,14 +2,14 @@ package com.example.chatappmvp;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import com.example.chatappmvp.eventbus.CanceledEvent;
 import com.example.chatappmvp.eventbus.PasswordErrorEvent;
 import com.example.chatappmvp.eventbus.SuccessEvent;
@@ -18,39 +18,35 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+
 public class LoginActivity extends AppCompatActivity implements LoginView {
 
-    private LoginPresenter loginPresenter;
 
-    private AutoCompleteTextView mEmailView;
-    private EditText editTextPass;
-    private View mProgressView;
-    private View mLoginFormView;
+
+    private LoginPresenter loginPresenter;
+    @BindView(R.id.email) AutoCompleteTextView mEmailView;
+    @BindView(R.id.password) EditText editTextPass;
+    @BindView(R.id.login_form) View mLoginFormView;
+    @BindView(R.id.login_progress) View mProgressView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mEmailView = findViewById(R.id.email);
-
-        editTextPass = findViewById(R.id.password);
-
-        mLoginFormView = findViewById(R.id.login_form);
-
-        mProgressView = findViewById(R.id.login_progress);
+        ButterKnife.bind(this);
 
         loginPresenter = new LoginPresenterImpl(this);
 
 
     }
 
-    public void onClickAttemptLogin(View view){
-        attemptLogin();
 
-    }
-
-    private void attemptLogin(){
+    @OnClick(R.id.email_sign_in_button)
+    public void attemptLogin(){
 
         mEmailView.setError(null);
         editTextPass.setError(null);
@@ -120,5 +116,14 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    public void showSnackbar(View view){
+        Snackbar.make(mLoginFormView,"This is a Snackbar",Snackbar.LENGTH_LONG).setAction("CLOSE", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        }).show();
     }
 }
